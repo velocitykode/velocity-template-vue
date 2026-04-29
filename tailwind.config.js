@@ -1,6 +1,6 @@
 export default {
   content: [
-    './resources/**/*.{html,js,jsx,ts,tsx}',
+    './resources/**/*.{html,js,ts,vue}',
   ],
   theme: {
     extend: {},

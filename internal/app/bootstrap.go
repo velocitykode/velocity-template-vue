@@ -68,7 +68,7 @@ func bootstrapView(s *velocity.Services) error {
 		return err
 	}
 
-	// Vite helper exposes {{ vite "resources/js/app.tsx" }} to the
+	// Vite helper exposes {{ vite "resources/js/app.ts" }} to the
 	// root template. In dev (public/hot exists) it emits dev-server
 	// tags; in prod it reads public/build/.vite/manifest.json and
 	// emits hashed asset URLs with modulepreload + stylesheet links.
