@@ -1,6 +1,14 @@
 # Velocity Template - Vue
 
-Full-stack starter template for the [Velocity](https://github.com/velocitykode/velocity) Go web framework using Vue 3 + Inertia.js, with SSR support.
+Vue 3 + Inertia.js starter template for the [Velocity](https://github.com/velocitykode/velocity) Go web framework, with SSR enabled out of the box.
+
+This repo is a **template** consumed by the Velocity installer. To start a new project:
+
+```bash
+velocity new myapp --stack=vue
+```
+
+The installer clones this template, rewrites the module placeholders, installs dependencies, builds the project's `vel` binary, and runs the initial migrations.
 
 ## Stack
 
@@ -11,48 +19,23 @@ Full-stack starter template for the [Velocity](https://github.com/velocitykode/v
 - **Styling**: Tailwind CSS 4
 - **Build**: Vite 7 (with `@velocitykode/velocity-vite-plugin`)
 
-## Usage
-
-This template is used automatically by the Velocity CLI:
-
-```bash
-velocity new myapp --stack=vue
-cd myapp
-./vel serve
-```
-
-## Development Commands
-
-```bash
-# Start dev server with hot reload
-./vel serve
-
-# Run database migrations
-./vel migrate
-
-# Generate a new controller
-./vel make:controller User
-
-# Build for production (client + SSR bundle)
-npm run build
-
-# Client-only build
-npm run build:client
-
-# SSR-only build
-npm run build:ssr
-```
-
 ## SSR
 
-SSR is enabled out of the box. `npm run build` produces:
+SSR is wired up by default. After scaffolding, `npm run build` in your project produces:
 
 - `public/build/` - client bundle
 - `public/build/ssr/ssr.js` - SSR entry consumed by the Inertia SSR runtime
 
+Toggle at runtime with `INERTIA_SSR_ENABLED` in the project's `.env`.
+
 ## Documentation
 
 Full documentation at **[velocity.velocitykode.com/docs](https://velocity.velocitykode.com/docs)**
+
+## Sibling Templates
+
+- [`velocity-template-react`](https://github.com/velocitykode/velocity-template-react) - React 19 + Inertia.js
+- [`velocity-template-api`](https://github.com/velocitykode/velocity-template-api) - API only (no frontend)
 
 ## License
 
