@@ -4,8 +4,3 @@ package config
 func GetAuthScheme() string {
 	return envOr("AUTH_SCHEME", "web")
 }
-
-// GetAuthModel returns the auth model (read at call time)
-func GetAuthModel() string {
-	return envOr("AUTH_MODEL", "User")
-}
