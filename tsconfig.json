@@ -16,5 +16,5 @@
       "@/*": ["./resources/js/*"]
     }
   },
-  "include": ["resources/js/**/*", "resources/js/**/*.vue"]
+  "include": ["resources/js/**/*", "resources/js/**/*.vue", "vite.config.ts"]
 }
