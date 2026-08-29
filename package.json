@@ -10,6 +10,7 @@
         "build:ssr": "vp build --ssr resources/js/ssr.ts --outDir public/build/ssr",
         "preview": "vp preview",
         "check": "vp check && vue-tsc -b",
+        "check:fix": "vp check --fix",
         "lint": "vp lint",
         "fmt": "vp fmt"
     },
