@@ -10,10 +10,10 @@ import (
 
 	"{{MODULE_NAME}}/config"
 	"{{MODULE_NAME}}/internal/models"
-	"{{MODULE_NAME}}/internal/sessionstore"
 
 	"github.com/velocitykode/velocity"
 	"github.com/velocitykode/velocity/auth"
+	"github.com/velocitykode/velocity/auth/drivers/session"
 	"github.com/velocitykode/velocity/bond/vite"
 	"github.com/velocitykode/velocity/cache"
 	"github.com/velocitykode/velocity/csrf"
@@ -59,12 +59,16 @@ func (p *AppModule) Start(s *velocity.Services) error {
 	return bootstrapView(s)
 }
 
-// bootstrapSessionStore installs the cache-backed ServerSessionStore on the
-// auth.Manager. A cookie-only session cannot propagate a Logout past the
-// process that handled it, so velocity refuses a production boot when the
-// session scheme has no server store. Backing it with the cache manager puts
-// the records wherever CACHE_DRIVER points - with redis they survive restarts
-// and stay coherent across instances. Returns nil when auth or cache is not
+// bootstrapSessionStore installs the framework's cache-backed
+// ServerSessionStore on the auth.Manager. A cookie-only session cannot
+// propagate a Logout past the process that handled it, so velocity refuses a
+// production boot when the session scheme has no server store. Backing it
+// with the default cache store puts the records wherever CACHE_DRIVER points:
+// with redis they survive restarts and stay coherent across instances, and
+// every write is atomic on the backend so a revocation on one instance holds
+// on all of them. The memory and redis cache drivers are supported; the file
+// driver is not, and NewCacheStore refuses it at boot rather than serving a
+// store whose revocations can be lost. Returns nil when auth or cache is not
 // wired, which is the JWT-only and test-bootstrap case.
 func bootstrapSessionStore(s *velocity.Services) error {
 	authManager, ok := s.Auth.(*auth.Manager)
@@ -75,7 +79,11 @@ func bootstrapSessionStore(s *velocity.Services) error {
 	if !ok || cm == nil {
 		return nil
 	}
-	store, err := sessionstore.New(cm)
+	backend, err := cm.DefaultStore()
+	if err != nil {
+		return err
+	}
+	store, err := session.NewCacheStore(backend)
 	if err != nil {
 		return err
 	}
