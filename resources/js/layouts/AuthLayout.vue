@@ -40,7 +40,7 @@ const year = computed(() => new Date().getFullYear());
             >
                 <div class="max-w-md">
                     <p class="caption-mono-upper mb-3 text-panel-muted">
-                        Velocity · v0.22.0
+                        Velocity · v0.81.1
                     </p>
                     <h2
                         class="font-sans text-4xl font-semibold leading-[1.05] tracking-tight text-panel-fg xl:text-5xl 2xl:text-[56px]"
