@@ -9,3 +9,9 @@ func GetViewTemplate() string {
 func GetViewVersion() string {
 	return envOr("VIEW_VERSION", "1.0")
 }
+
+// GetViewErrorPage returns the Inertia page component rendered for a failed
+// browser request (read at call time). Defaults to the shipped Error page.
+func GetViewErrorPage() string {
+	return envOr("VIEW_ERROR_PAGE", "Error")
+}

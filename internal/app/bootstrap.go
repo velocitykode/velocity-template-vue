@@ -147,6 +147,8 @@ func bootstrapView(s *velocity.Services) error {
 				return out
 			},
 		},
+		// Rendered for every failed browser request, at its real status.
+		ErrorPage: config.GetViewErrorPage(),
 	}
 	if except := os.Getenv("VIEW_SSR_EXCEPT"); except != "" {
 		for _, p := range strings.Split(except, ",") {
