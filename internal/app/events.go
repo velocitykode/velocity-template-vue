@@ -30,7 +30,7 @@ func (f listenerFunc) Async() bool { return false }
 func Events(logger log.Logger) func(events.Dispatcher) {
 	return func(d events.Dispatcher) {
 		// Request lifecycle events
-		d.Listen("request.started", listenerFunc(func(_ context.Context, e interface{}) error {
+		d.Listen("router.request.started", listenerFunc(func(_ context.Context, e interface{}) error {
 			if req, ok := e.(*router.RequestStarted); ok {
 				logger.Debug("Request started",
 					"request_id", req.RequestID,
@@ -41,7 +41,7 @@ func Events(logger log.Logger) func(events.Dispatcher) {
 			return nil
 		}))
 
-		d.Listen("request.handled", listenerFunc(func(_ context.Context, e interface{}) error {
+		d.Listen("router.request.completed", listenerFunc(func(_ context.Context, e interface{}) error {
 			if req, ok := e.(*router.RequestHandled); ok {
 				logger.Info("Request completed",
 					"request_id", req.RequestID,
@@ -54,7 +54,7 @@ func Events(logger log.Logger) func(events.Dispatcher) {
 			return nil
 		}))
 
-		d.Listen("request.failed", listenerFunc(func(_ context.Context, e interface{}) error {
+		d.Listen("router.request.failed", listenerFunc(func(_ context.Context, e interface{}) error {
 			if req, ok := e.(*router.RequestFailed); ok {
 				logger.Error("Request failed",
 					"request_id", req.RequestID,
@@ -66,7 +66,7 @@ func Events(logger log.Logger) func(events.Dispatcher) {
 		}))
 
 		// Database query events
-		d.Listen("query.executed", listenerFunc(func(_ context.Context, e interface{}) error {
+		d.Listen("orm.query.completed", listenerFunc(func(_ context.Context, e interface{}) error {
 			if q, ok := e.(*orm.QueryExecuted); ok {
 				logger.Debug("Query executed",
 					"sql", q.SQL,
@@ -85,7 +85,7 @@ func Events(logger log.Logger) func(events.Dispatcher) {
 			return nil
 		}))
 
-		d.Listen("cache.miss", listenerFunc(func(_ context.Context, e interface{}) error {
+		d.Listen("cache.missed", listenerFunc(func(_ context.Context, e interface{}) error {
 			if c, ok := e.(*cache.CacheMiss); ok {
 				logger.Debug("Cache miss", "key", c.Key)
 			}
