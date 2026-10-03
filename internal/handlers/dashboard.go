@@ -3,14 +3,17 @@ package handlers
 import (
 	"{{MODULE_NAME}}/internal/models"
 
-	"github.com/velocitykode/velocity/auth"
 	"github.com/velocitykode/velocity/router"
 	"github.com/velocitykode/velocity/view"
 )
 
 // Dashboard displays the dashboard
 func Dashboard(ctx *router.Context) error {
-	user := auth.FromContext(ctx).User(ctx.Request)
+	manager, err := ctx.Auth()
+	if err != nil {
+		return err
+	}
+	user := manager.User(ctx.Request)
 
 	// Convert user to map for props. The concrete type is *models.User
 	// because internal/app/bootstrap.go installs the auth provider on that
@@ -22,10 +25,9 @@ func Dashboard(ctx *router.Context) error {
 		userMap["email"] = authUser.Email
 	}
 
-	view.Render(ctx, "Dashboard", view.Props{
+	return view.Render(ctx, "Dashboard", view.Props{
 		"auth": map[string]interface{}{
 			"user": userMap,
 		},
 	})
-	return nil
 }

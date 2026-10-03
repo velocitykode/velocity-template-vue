@@ -17,6 +17,7 @@ import (
 	"github.com/velocitykode/velocity"
 	"github.com/velocitykode/velocity/auth"
 	"github.com/velocitykode/velocity/auth/drivers/schemes"
+	"github.com/velocitykode/velocity/contract"
 	"github.com/velocitykode/velocity/router"
 	velhttp "github.com/velocitykode/velocity/testing/http"
 	"github.com/velocitykode/velocity/velocitytest"
@@ -166,24 +167,24 @@ func (*probeUser) GetAuthPassword() string  { return "unused-test-hash" }
 func (*probeUser) GetRememberToken() string { return "" }
 func (*probeUser) SetRememberToken(string)  {}
 
-func (u *countingUsers) FindByID(any) (auth.Authenticatable, error) { return &probeUser{}, nil }
-func (u *countingUsers) FindByIDCtx(context.Context, any) (auth.Authenticatable, error) {
+func (u *countingUsers) FindByID(any) (contract.Authenticatable, error) { return &probeUser{}, nil }
+func (u *countingUsers) FindByIDCtx(context.Context, any) (contract.Authenticatable, error) {
 	return &probeUser{}, nil
 }
-func (u *countingUsers) FindByCredentials(map[string]any) (auth.Authenticatable, error) {
+func (u *countingUsers) FindByCredentials(map[string]any) (contract.Authenticatable, error) {
 	return &probeUser{}, nil
 }
-func (u *countingUsers) FindByCredentialsCtx(context.Context, map[string]any) (auth.Authenticatable, error) {
+func (u *countingUsers) FindByCredentialsCtx(context.Context, map[string]any) (contract.Authenticatable, error) {
 	return &probeUser{}, nil
 }
-func (u *countingUsers) ValidateCredentials(auth.Authenticatable, map[string]any) bool {
+func (u *countingUsers) ValidateCredentials(contract.Authenticatable, map[string]any) bool {
 	u.mu.Lock()
 	u.checks++
 	u.mu.Unlock()
 	return false
 }
-func (u *countingUsers) UpdateRememberToken(auth.Authenticatable, string) error { return nil }
-func (u *countingUsers) UpdateRememberTokenCtx(context.Context, auth.Authenticatable, string) error {
+func (u *countingUsers) UpdateRememberToken(contract.Authenticatable, string) error { return nil }
+func (u *countingUsers) UpdateRememberTokenCtx(context.Context, contract.Authenticatable, string) error {
 	return nil
 }
 func (u *countingUsers) verified() int {

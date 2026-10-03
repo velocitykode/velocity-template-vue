@@ -3,7 +3,6 @@ package handlers
 import (
 	"{{MODULE_NAME}}/internal/models"
 
-	"github.com/velocitykode/velocity/auth"
 	"github.com/velocitykode/velocity/router"
 	"github.com/velocitykode/velocity/validation"
 	"github.com/velocitykode/velocity/validation/vform"
@@ -49,13 +48,16 @@ func (r *RegisterRequest) Rules() validation.Rules {
 
 // AuthShowLoginForm displays the login page
 func AuthShowLoginForm(ctx *router.Context) error {
-	view.Render(ctx, "Auth/Login", view.Props{})
-	return nil
+	return view.Render(ctx, "Auth/Login", view.Props{})
 }
 
 // AuthLogin handles the login request
 func AuthLogin(ctx *router.Context) error {
 	req, err := vform.Form[LoginRequest](ctx)
+	if err != nil {
+		return err
+	}
+	manager, err := ctx.Auth()
 	if err != nil {
 		return err
 	}
@@ -65,34 +67,36 @@ func AuthLogin(ctx *router.Context) error {
 		"password": req.Password,
 	}
 
-	success, _ := auth.FromContext(ctx).Attempt(ctx.Response, ctx.Request, credentials, req.Remember)
+	success, _ := manager.Attempt(ctx.Response, ctx.Request, credentials, req.Remember)
 	if !success {
 		ctx.FlashErrors(map[string][]string{
 			"email": {"These credentials do not match our records."},
 		})
 		ctx.FlashInput(map[string]any{"email": req.Email})
-		view.Back(ctx)
-		return nil
+		return view.Back(ctx)
 	}
 
 	// Honour the intended destination the auth middleware stashed in the
 	// session before bouncing the guest to /login (falls back to
 	// /dashboard for a direct login).
-	view.Redirect(ctx, ctx.Intended("/dashboard"))
-	return nil
+	return view.Redirect(ctx, ctx.Intended("/dashboard"))
 }
 
 // AuthLogout handles the logout request
 func AuthLogout(ctx *router.Context) error {
-	auth.FromContext(ctx).Logout(ctx.Response, ctx.Request)
-	view.Redirect(ctx, "/login")
-	return nil
+	manager, err := ctx.Auth()
+	if err != nil {
+		return err
+	}
+	if err := manager.Logout(ctx.Response, ctx.Request); err != nil {
+		return err
+	}
+	return view.Redirect(ctx, "/login")
 }
 
 // AuthShowRegisterForm displays the registration page
 func AuthShowRegisterForm(ctx *router.Context) error {
-	view.Render(ctx, "Auth/Register", view.Props{})
-	return nil
+	return view.Render(ctx, "Auth/Register", view.Props{})
 }
 
 // AuthRegister handles the registration request
@@ -101,14 +105,17 @@ func AuthRegister(ctx *router.Context) error {
 	if err != nil {
 		return err
 	}
+	manager, err := ctx.Auth()
+	if err != nil {
+		return err
+	}
 
-	hashedPassword, err := auth.FromContext(ctx).Hash(req.Password)
+	hashedPassword, err := manager.Hash(req.Password)
 	if err != nil {
 		ctx.Log().Error("Failed to hash password", "error", err)
 		ctx.FlashErrors(map[string][]string{"password": {"Failed to process password."}})
 		ctx.FlashInput(map[string]any{"name": req.Name, "email": req.Email})
-		view.Back(ctx)
-		return nil
+		return view.Back(ctx)
 	}
 
 	user, err := models.User{}.Create(ctx.Request.Context(), map[string]any{
@@ -120,8 +127,7 @@ func AuthRegister(ctx *router.Context) error {
 		ctx.Log().Error("Failed to create user", "error", err)
 		ctx.FlashErrors(map[string][]string{"email": {"Failed to create account. Please try again."}})
 		ctx.FlashInput(map[string]any{"name": req.Name, "email": req.Email})
-		view.Back(ctx)
-		return nil
+		return view.Back(ctx)
 	}
 
 	ctx.Log().Info("User created successfully", "email", user.Email, "id", user.ID)
@@ -130,10 +136,8 @@ func AuthRegister(ctx *router.Context) error {
 		"email":    req.Email,
 		"password": req.Password,
 	}
-	if success, _ := auth.FromContext(ctx).Attempt(ctx.Response, ctx.Request, credentials, false); success {
-		view.Redirect(ctx, ctx.Intended("/dashboard"))
-	} else {
-		view.Redirect(ctx, "/login")
+	if success, _ := manager.Attempt(ctx.Response, ctx.Request, credentials, false); success {
+		return view.Redirect(ctx, ctx.Intended("/dashboard"))
 	}
-	return nil
+	return view.Redirect(ctx, "/login")
 }
